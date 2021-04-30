@@ -3,6 +3,7 @@ extends KinematicBody2D
 const ACCELERATION = 500
 const FRICTION = 500
 const MAX_SPEED = 80
+const ROLL_SPEED = 115
 
 enum {
 	MOVE,
@@ -12,6 +13,7 @@ enum {
 
 var state = MOVE
 var velocity = Vector2.ZERO
+var roll_vector = Vector2.LEFT
 
 onready var animationPlayer = $AnimationPlayer
 onready var animationTree = $AnimationTree
@@ -25,16 +27,19 @@ func _physics_process(delta):
 		MOVE:
 			move_state(delta)
 		ROLL:
-			pass
+			roll_state()
 		ATTACK:
 			attack_state()
-
-func attack_state():
-	animationState.travel("Attack")
 
 func attack_animation_finished():
 	velocity = Vector2.ZERO
 	state = MOVE
+
+func attack_state():
+	animationState.travel("Attack")
+
+func move():
+	velocity = move_and_slide(velocity)
 
 func move_state(delta):
 	var input_vector = Vector2.ZERO
@@ -47,13 +52,27 @@ func move_state(delta):
 		animationTree.set("parameters/Idle/blend_position", input_vector)
 		animationTree.set("parameters/Run/blend_position", input_vector)
 		animationTree.set("parameters/Attack/blend_position", input_vector)
+		animationTree.set("parameters/Roll/blend_position", input_vector)
 		animationState.travel("Run")
 		velocity = velocity.move_toward(input_vector * MAX_SPEED, ACCELERATION * delta)
+		roll_vector = input_vector
 	else:
 		animationState.travel("Idle")
 		velocity = velocity.move_toward(Vector2.ZERO, FRICTION * delta)
 	
-	velocity = move_and_slide(velocity)
+	move()
 	
 	if Input.is_action_just_pressed("attack"):
 		state = ATTACK
+	
+	if Input.is_action_just_pressed("roll"):
+		state = ROLL
+
+func roll_animation_finished():
+	velocity = velocity * 0.8
+	state = MOVE
+
+func roll_state():
+	velocity = roll_vector * ROLL_SPEED
+	animationState.travel("Roll")
+	move()
