@@ -12,7 +12,7 @@ signal invincibility_ended
 func _on_Timer_timeout():
 	self.invincible = false
 	
-func create_hit_effect(_area):
+func create_hit_effect():
 	var effect = HitEffect.instance()
 	var main = get_tree().current_scene
 	main.add_child(effect)
