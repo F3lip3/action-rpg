@@ -18,6 +18,7 @@ var state = CHASE
 
 onready var playerDetectionZone = $PlayerDetectionZone
 onready var hurtbox = $Hurtbox
+onready var softCollision = $SoftCollision
 onready var sprite = $BatSprite
 onready var stats = $Stats
 
@@ -39,6 +40,8 @@ func _physics_process(delta):
 				state = IDLE
 			sprite.flip_h = velocity.x < 0
 	
+	if softCollision.is_colliding():
+		velocity += softCollision.get_push_vector() * delta * 400
 	velocity = move_and_slide(velocity)
 
 func _on_Hurtbox_area_entered(area):
