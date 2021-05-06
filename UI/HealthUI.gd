@@ -9,7 +9,9 @@ onready var heartUIEmpty = $HeartUIEmpty
 func _ready():
 	self.max_hearts = PlayerStats.max_health
 	self.hearts = PlayerStats.health
+	# warning-ignore:return_value_discarded
 	PlayerStats.connect("health_changed", self, "set_hearts")
+	# warning-ignore:return_value_discarded
 	PlayerStats.connect("max_health_changed", self, "set_max_hearts")
 
 func set_hearts(value):
